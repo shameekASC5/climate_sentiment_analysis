@@ -29,7 +29,7 @@ class Dataset(torch.utils.data.Dataset):
 model_name = "bert-base-uncased"
 model = BertForSequenceClassification.from_pretrained(model_name, return_dict=True, num_labels=5)
 model.train()  # tell model to enter "train" mode
-optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
 
 # load labeled data
 labeled_data = pandas.read_csv("data/2022-05-18-climate-change-labeled-samples.csv")[['index', 'text', 'label_text']].set_index('index').sort_index()
@@ -63,8 +63,8 @@ training_args = TrainingArguments(
     num_train_epochs=3,              # total # of training epochs
     per_device_train_batch_size=8,  # batch size per device during training
     per_device_eval_batch_size=8,   # batch size for evaluation
-    warmup_steps=50,                # number of warmup steps for learning rate scheduler
-    weight_decay=0.01,               # strength of weight decay
+    warmup_steps=100,                # number of warmup steps for learning rate scheduler
+    weight_decay=0.05,               # strength of weight decay
     logging_dir='./logs',            # directory for storing logs
     seed=0,
     load_best_model_at_end=True,
