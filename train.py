@@ -78,25 +78,15 @@ trainer = Trainer(
     eval_dataset=eval_dataset            # evaluation dataset
 )
 trainer.train()
-# trainer.evaluate(eval_dataset=eval_dataset)
+trainer.save_model()
+trainer.evaluate(eval_dataset=eval_dataset)
 
 # load unlabeled data
 unlabeled_data = pandas.read_csv("data/test.csv")[['index', 'text', 'label_text']].set_index('index').sort_index()
-# remove irrelevant label
-unlabeled_data = unlabeled_data.loc['irrelevant or no opinion on climate change' != unlabeled_data['label_text']]
-# double check for 5-labels 
-print(unlabeled_data['label_text'].unique())
-assert 5 == len(unlabeled_data['label_text'].unique())
-unlabeled_data['labels'] = unlabeled_data['label_text'].map({
-    'Strongly agree with climate change': 0,
-    'Slightly agree with climate change': 1,
-    'Neutral to climate change': 2,
-    'Slightly disagree with climate change': 3,
-    'Strongly disagree with climate change': 4
-}).to_list()
+
 # tokenize data
 encoding = tokenizer(unlabeled_data['text'].to_list(), return_tensors='pt', padding=True, truncation=True, max_length=128)
 # eval
-model(unlabeled_data)
-
-    
+output = model(input_ids = encoding['input_ids'], attention_mask = encoding['attention_mask'], token_type_ids = encoding['token_type_ids'])
+logits = output[:1]    
+print(logits)
